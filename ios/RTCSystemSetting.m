@@ -13,6 +13,9 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <ifaddrs.h>
 #import <net/if.h>
+#import <AVFoundation/AVAudioSession.h>
+
+NSString * const outputVolumeSelector = @"outputVolume";
 
 @import UIKit;
 @import MediaPlayer;
@@ -28,29 +31,12 @@
 -(instancetype)init{
     self = [super init];
     if(self){
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(volumeChanged:)
-                                                     name:@"AVSystemController_SystemVolumeDidChangeNotification"
-                                                   object:nil];
-
         cb = [[CBCentralManager alloc] initWithDelegate:nil queue:nil options:@{CBCentralManagerOptionShowPowerAlertKey: @NO}];
     }
 
-    [self initVolumeView];
     [self initSetting];
 
     return self;
-}
-
--(void)initVolumeView{
-    volumeView = [[MPVolumeView alloc] initWithFrame:CGRectMake(-[UIScreen mainScreen].bounds.size.width, 0, 0, 0)];
-    [self showVolumeUI:NO];
-    for (UIView* view in volumeView.subviews) {
-        if ([view.class.description isEqualToString:@"MPVolumeSlider"]){
-            volumeSlider = (UISlider*)view;
-            break;
-        }
-    }
 }
 
 -(void)initSetting{
@@ -60,6 +46,21 @@
                 @"bluetooth": (newSys?@"QXBwLVByZWZzOnJvb3Q9Qmx1ZXRvb3Ro" : @"cHJlZnM6cm9vdD1CbHVldG9vdGg="),
                 @"airplane": (newSys?@"QXBwLVByZWZzOnJvb3Q9QUlSUExBTkVfTU9ERQ==" : @"cHJlZnM6cm9vdD1BSVJQTEFORV9NT0RF")
                 };
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    NSLog(@"Callback!");
+    if ([keyPath isEqual:@"outputVolume"])
+    {
+        float volume = [object outputVolume];
+        NSLog(@"Callback volume %f", volume);
+        
+        if(hasListeners){
+            [self sendEventWithName:@"EventVolume" body:@{@"value": [NSNumber numberWithFloat:volume]}];
+        }
+    }
+    
 }
 
 +(BOOL)requiresMainQueueSetup{
@@ -77,17 +78,11 @@ RCT_EXPORT_METHOD(getBrightness:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
     resolve([NSNumber numberWithDouble:[UIScreen mainScreen].brightness]);
 }
 
-RCT_EXPORT_METHOD(setVolume:(float)val config:(NSDictionary *)config){
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        id showUI = [config objectForKey:@"showUI"];
-        [self showVolumeUI:(showUI != nil && [showUI boolValue])];
-        volumeSlider.value = val;
-    });
-}
-
 RCT_EXPORT_METHOD(getVolume:(NSString *)type resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
     dispatch_sync(dispatch_get_main_queue(), ^{
-        resolve([NSNumber numberWithFloat:[volumeSlider value]]);
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        float vol = [[AVAudioSession sharedInstance] outputVolume];
+        resolve([NSNumber numberWithFloat:vol]);
     });
 }
 
@@ -135,14 +130,6 @@ RCT_EXPORT_METHOD(activeListener:(NSString *)type resolve:(RCTPromiseResolveBloc
     }
 }
 
--(void)showVolumeUI:(BOOL)flag{
-    if(flag && [volumeView superview]){
-        [volumeView removeFromSuperview];
-    }else if(!flag && ![volumeView superview]){
-        [[[[UIApplication sharedApplication] keyWindow] rootViewController].view addSubview:volumeView];
-    }
-}
-
 -(void)openSetting:(NSString*)service{
     NSString *url = [self dencodeStr:[setting objectForKey:service]];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:[NSDictionary new] completionHandler:nil];
@@ -184,16 +171,25 @@ RCT_EXPORT_METHOD(activeListener:(NSString *)type resolve:(RCTPromiseResolveBloc
 
 -(void)startObserving {
     hasListeners = YES;
+    
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setActive:YES error:nil];
+    
+    [session addObserver:self
+              forKeyPath:outputVolumeSelector
+                 options:NSKeyValueObservingOptionNew
+                 context:nil];
 }
 
 -(void)stopObserving {
     hasListeners = NO;
-}
 
--(void)volumeChanged:(NSNotification *)notification{
-    if(hasListeners){
-        float volume = [[[notification userInfo] objectForKey:@"AVSystemController_AudioVolumeNotificationParameter"] floatValue];
-        [self sendEventWithName:@"EventVolume" body:@{@"value": [NSNumber numberWithFloat:volume]}];
+    @try
+    {
+        [[AVAudioSession sharedInstance] removeObserver:self forKeyPath:@"outputVolume"];
+    }
+    @catch(id anException)
+    {
     }
 }
 

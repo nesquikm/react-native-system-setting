@@ -8,7 +8,6 @@ method | description
 ------ | -----------
 **Volume**|
 getVolume(type:string) => Promise | Get the system volume. <br><br>`type` must be one of `music`, `call`, `system`, `ring`, `alarm`, `notification`, default is `music`
-setVolume(val:float, config:object) | Set the system volume by specified value, from 0 to 1. 0 for mute, and 1 is max volume.<br><br> `config` can be `{type: 'music', playSound:true, showUI:true}`<br><br> `type` : must be one of `music`, `call`, `system`, `ring`, `alarm`, `notification`, default is `music`.(Android only) <br>`playSound`: Whether to play a sound when changing the volume, default is `false`(Android only)<br>`showUI`: Show a toast containing the current volume, default is `false`(Android & iOS)<br><br> **since 1.2.2**
 addVolumeListener(callback) | Listen the volume changing, and it will return the listener. More info see [the example](https://github.com/c19354837/react-native-system-setting/blob/master/examples/SystemSettingExample/index.js#L42)
 removeVolumeListener(listener)| Remove listener when it no longer needed.
 ---|---
@@ -20,7 +19,7 @@ setAppBrightness(val:float)| For Android, `setBrightness()` or `setBrightnessFor
 getAppBrightness() => Promise | Get the app brightness, and it will returns system brightness if you haven't call `setAppBrightness(val)` yet. (iOS allways returns system brightness)
 getScreenMode() => Promise| (Only for Android, iOS will return -1). Get the screen mode, 0 is manual, while 1 is automatic.
 setScreenMode(mode:int) => Promise|(Only for Android, iOS cannot change it). Change the screen mode, 0 is manual, while 1 is automatic.<br><br>Return false if permission deny ( iOS always be true
-grantWriteSettingPremission()| open app setting page. It's user-friendly when you need some permission. Normally, you can call it if `setScreenMode()`, `setBrightness()` or `setBrightnessForce()` return false 
+grantWriteSettingPremission()| open app setting page. It's user-friendly when you need some permission. Normally, you can call it if `setScreenMode()`, `setBrightness()` or `setBrightnessForce()` return false
 saveBrightness()|It will save current brightness and screen mode.
 restoreBrightness() => Promise|Restore brightness and screen mode back to saveBrightness(). While iOS only restore the brightness, Android will restore both. <br><br>You should call this before setBrightness() or setBrightnessForce(). <br><br>It will return the saved brightness.
 ---|---

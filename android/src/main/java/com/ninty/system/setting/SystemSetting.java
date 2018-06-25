@@ -80,7 +80,7 @@ public class SystemSetting extends ReactContextBaseJavaModule implements Activit
                         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                             .emit("EventVolume", para);
                     } catch (RuntimeException e) {
-                        // Possible to interact with volume before JS bundle execution is finished. 
+                        // Possible to interact with volume before JS bundle execution is finished.
                         // This is here to avoid app crashing.
                     }
                 }
@@ -267,24 +267,6 @@ public class SystemSetting extends ReactContextBaseJavaModule implements Activit
             e.printStackTrace();
             promise.reject("-1", "get brightness fail", e);
         }
-    }
-
-    @ReactMethod
-    public void setVolume(float val, ReadableMap config) {
-        mContext.unregisterReceiver(volumeBR);
-        String type = config.getString("type");
-        boolean playSound = config.getBoolean("playSound");
-        boolean showUI = config.getBoolean("showUI");
-        int volType = getVolType(type);
-        int flags = 0;
-        if (playSound) {
-            flags |= AudioManager.FLAG_PLAY_SOUND;
-        }
-        if (showUI) {
-            flags |= AudioManager.FLAG_SHOW_UI;
-        }
-        am.setStreamVolume(volType, (int) (val * am.getStreamMaxVolume(volType)), flags);
-        mContext.registerReceiver(volumeBR, filter);
     }
 
     @ReactMethod

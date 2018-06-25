@@ -101,9 +101,6 @@ SystemSetting.getVolume().then((volume)=>{
     console.log('Current volume is ' + volume);
 });
 
-// change the volume
-SystemSetting.setVolume(0.5);
-
 // listen the volume changing if you need
 const volumeListener = SystemSetting.addVolumeListener((data) => {
     const volume = data.value;
@@ -111,10 +108,10 @@ const volumeListener = SystemSetting.addVolumeListener((data) => {
 });
 
 //remove listener when you need it no more
-SystemSetting.removeVolumeListener(volumeListener)       
+SystemSetting.removeVolumeListener(volumeListener)
 ```
 
-> `setVolume` can do more, [more detail](https://github.com/c19354837/react-native-system-setting/blob/master/API.md) 
+> `setVolume` can do more, [more detail](https://github.com/c19354837/react-native-system-setting/blob/master/API.md)
 
 **brightness**
 
@@ -224,13 +221,13 @@ Some APIs are dangerous for iOS:
 * `switchLocation()`
 * `switchAirplane()`
 
-I implement them by using non-public APIs, which is not permitted on the App Store, see [this issure](https://github.com/c19354837/react-native-system-setting/issues/28). 
+I implement them by using non-public APIs, which is not permitted on the App Store, see [this issure](https://github.com/c19354837/react-native-system-setting/issues/28).
 
-If you are developing a App Store version, you have to give up these APIs. 
+If you are developing a App Store version, you have to give up these APIs.
 
 To avoid unnecessary trouble, you can call `SystemSetting.setAppStore(true)` which will invalidate these APIs.
 
-> As an alternative, you can show a tip to tell the user how to change the system setting. 
+> As an alternative, you can show a tip to tell the user how to change the system setting.
 
 ## Android permission
 
@@ -267,7 +264,7 @@ There are some different APIs that end with `silence`. They can do the job progr
 
     <!-- switchBluetoothSilence() -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    
+
     ...
 
 </manifest>
