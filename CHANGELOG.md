@@ -1,3 +1,30 @@
+# V1.6.0
+**2018-09-19**
+
+bluetooth issues for App Store, see [detail](https://github.com/c19354837/react-native-system-setting/issues/55)
+
+# V1.5.3
+**2018-08-20**
+
+fix bug: `setVolume()` may cause a crash, see [detail](https://github.com/c19354837/react-native-system-setting/pull/54)
+
+# V1.5.2
+**2018-08-05**
+
+`setVolume()` may crash in >= Android M, see [detail](https://github.com/c19354837/react-native-system-setting/pull/48)
+
+RN 0.56.+ compatible, [Use project-wide properties and new dependency](https://github.com/c19354837/react-native-system-setting/pull/46)
+
+# V1.5.1
+**2018-08-02**
+
+show System Volume UI by default for iOS, see [detail](https://github.com/c19354837/react-native-system-setting/pull/43)
+
+# V1.5.0
+**2018-07-10**
+
+breaking change: remove default Android permission, see [detail](https://github.com/c19354837/react-native-system-setting/pull/44)
+
 # V1.4.6
 **2018-06-20**
 
